@@ -1,0 +1,41 @@
+# code: language=ansible
+---
+- name: Create physical volume
+  community.general.lvm_pv:
+    device: "{{ item }}"
+    state: present
+  loop: "{{ nfs_disks }}"
+
+- name: Create Volume Group
+  community.general.lvg:
+    vg: "{{ nfs_vg_name }}"
+    pvs: "{{ item }}"
+  loop: "{{ nfs_disks }}"
+
+- name: Create logical volume
+  community.general.lvol:
+    vg: "{{ nfs_vg_name }}"
+    lv: "{{ nfs_lv_name }}"
+    size: 100%FREE
+    state: present
+
+- name: Create a xfs filesystem on scsi2
+  community.general.filesystem:
+    fstype: xfs
+    dev: "/dev/{{ nfs_vg_name }}/{{ nfs_lv_name }}"
+
+- name: Create a directory
+  ansible.builtin.file:
+    path: /nfs
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+
+- name: Mount up device by UUID
+  ansible.posix.mount:
+    path: /nfs
+    src: "/dev/{{ nfs_vg_name }}/{{ nfs_lv_name }}"
+    fstype: xfs
+    opts: defaults
+    state: mounted

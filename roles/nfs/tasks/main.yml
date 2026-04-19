@@ -1,0 +1,4 @@
+# code: language=ansible
+---
+- name: Import disk tasks
+  ansible.builtin.import_tasks: disks.yml
