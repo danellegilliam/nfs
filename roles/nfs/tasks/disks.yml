@@ -12,12 +12,18 @@
     pvs: "{{ item }}"
   loop: "{{ nfs_disks }}"
 
+- name: Check if LV device path exists
+  ansible.builtin.stat:
+    path: "/dev/{{ nfs_vg_name }}/{{ nfs_lv_name }}"
+  register: nfs_lv_stat
+
 - name: Create logical volume
   community.general.lvol:
     vg: "{{ nfs_vg_name }}"
     lv: "{{ nfs_lv_name }}"
     size: 100%FREE
     state: present
+  when: not nfs_lv_stat.stat.exists
 
 - name: Create a xfs filesystem on scsi2
   community.general.filesystem:
