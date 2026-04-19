@@ -1,4 +1,10 @@
 # code: language=ansible
 ---
+- name: Import nfs tasks
+  ansible.builtin.import_tasks: nfs.yml
+
 - name: Import disk tasks
   ansible.builtin.import_tasks: disks.yml
+
+- name: Import export tasks
+  ansible.builtin.import_tasks: exports.yml

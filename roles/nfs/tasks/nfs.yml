@@ -1,0 +1,12 @@
+# code: language=ansible
+---
+- name: Install NFS server packages
+  ansible.builtin.dnf:
+    name: nfs-utils
+    state: present
+
+- name: Ensure NFS service is running and enabled
+  ansible.builtin.service:
+    name: nfs-server
+    state: started
+    enabled: true
